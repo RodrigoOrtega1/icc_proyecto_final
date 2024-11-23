@@ -16,6 +16,7 @@ public class MetadataRead{
 
     private static String METADATA_FILE_NAME = "";
     private static File METADATA_FILE;
+    private static String STRING_TO_WRITE = "";
 
     private static String degreesToDecimal(RationalNumber degrees, RationalNumber minutes, RationalNumber seconds) {
         double degreesToDouble = degrees.doubleValue();
@@ -26,18 +27,6 @@ public class MetadataRead{
         double decimalDegrees = degreesToDouble + minutesToDegrees + secondsToDegrees;
         String result = Double.toString(decimalDegrees);
         return result;
-    }
-
-    private static void write(ImageMetadata metadata, File file) throws IOException {
-        try (FileWriter writer = new FileWriter(METADATA_FILE, true)) {
-            writer.write(metadata.toString() + "\n");
-        }
-    }
-
-    private static void writeSimpleStrings(String string, File file) throws IOException{
-        try (FileWriter writer = new FileWriter(METADATA_FILE, true)) {
-            writer.write(string + "\n");
-        }
     }
 
     private static String removeExtension(String fname) {
@@ -52,13 +41,19 @@ public class MetadataRead{
         METADATA_FILE = new File(METADATA_FILE_NAME);
         try {
             if (METADATA_FILE.createNewFile()) {
-                System.out.println("File created: " + METADATA_FILE.getName());
+                System.out.println("Creando archivo: " + METADATA_FILE.getName());
             } else {
-                System.out.println("File already exists.");
+                System.out.println("El archivo ya existe.");
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
+        }
+    }
+
+    public static void write() throws IOException {        
+        try (FileWriter writer = new FileWriter(METADATA_FILE, false)) {
+            writer.write(STRING_TO_WRITE);
         }
     }
 
@@ -67,7 +62,11 @@ public class MetadataRead{
         final ImageMetadata metadata = Imaging.getMetadata(imgFile);
         METADATA_FILE_NAME = removeExtension(imgFile.getName()) + "-meta.txt";
         createFile();
-        write(metadata, METADATA_FILE);
+        if (metadata == null || metadata.getItems().isEmpty()){
+            STRING_TO_WRITE = "Tu imagen no contiene metadatos.";
+        } else {
+            STRING_TO_WRITE = metadata.toString() + '\n';
+        }
         
         /** Get specific meta data information by drilling down the meta **/
         if (metadata instanceof JpegImageMetadata) {
@@ -86,9 +85,9 @@ public class MetadataRead{
                     final double longitude = gpsInfo.getLongitudeAsDegreesEast();
                     final double latitude = gpsInfo.getLatitudeAsDegreesNorth();
     
-                    writeSimpleStrings("    " + "GPS Description: " + gpsDescription, METADATA_FILE);
-                    writeSimpleStrings("    " + "GPS Longitude (Degrees East): " + longitude, METADATA_FILE);
-                    writeSimpleStrings("    " + "GPS Latitude (Degrees North): " + latitude, METADATA_FILE);
+                    STRING_TO_WRITE += "    " + "GPS Description: " + gpsDescription + '\n';
+                    STRING_TO_WRITE += "    " + "GPS Longitude (Degrees East): " + longitude + '\n';
+                    STRING_TO_WRITE += "    " + "GPS Latitude (Degrees North): " + latitude + '\n';
                 }
             }
     
@@ -117,10 +116,10 @@ public class MetadataRead{
                 // gpsLatitude: 8 degrees, 40 minutes, 42.2 seconds S
                 // gpsLongitude: 115 degrees, 26 minutes, 21.8 seconds E
                 
-                writeSimpleStrings("    " + "GPS Latitude: " + gpsLatitudeDegrees.toDisplayString() + " degrees, " + gpsLatitudeMinutes.toDisplayString() + " minutes, " + gpsLatitudeSeconds.toDisplayString() + " seconds " + gpsLatitudeRef, METADATA_FILE);
-                writeSimpleStrings("    " + "GPS Longitude: " + gpsLongitudeDegrees.toDisplayString() + " degrees, " + gpsLongitudeMinutes.toDisplayString() + " minutes, " + gpsLongitudeSeconds.toDisplayString() + " seconds " + gpsLongitudeRef, METADATA_FILE);
-                writeSimpleStrings("    " + "Decimal Degrees Latitude: " + degreesToDecimal(gpsLatitudeDegrees, gpsLatitudeMinutes, gpsLatitudeSeconds), METADATA_FILE);
-                writeSimpleStrings("    " + "Decimal Degrees Longitude: " + degreesToDecimal(gpsLongitudeDegrees,gpsLongitudeMinutes,gpsLongitudeSeconds), METADATA_FILE);
+                STRING_TO_WRITE += "    " + "GPS Latitude: " + gpsLatitudeDegrees.toDisplayString() + " degrees, " + gpsLatitudeMinutes.toDisplayString() + " minutes, " + gpsLatitudeSeconds.toDisplayString() + " seconds " + gpsLatitudeRef + '\n';
+                STRING_TO_WRITE += "    " + "GPS Longitude: " + gpsLongitudeDegrees.toDisplayString() + " degrees, " + gpsLongitudeMinutes.toDisplayString() + " minutes, " + gpsLongitudeSeconds.toDisplayString() + " seconds " + gpsLongitudeRef + '\n';
+                STRING_TO_WRITE += "    " + "Decimal Degrees Latitude: " + degreesToDecimal(gpsLatitudeDegrees, gpsLatitudeMinutes, gpsLatitudeSeconds) + '\n';
+                STRING_TO_WRITE += "    " + "Decimal Degrees Longitude: " + degreesToDecimal(gpsLongitudeDegrees,gpsLongitudeMinutes,gpsLongitudeSeconds) + '\n';
             }
         }
     }
@@ -128,9 +127,13 @@ public class MetadataRead{
     private static void writeTagValue(final JpegImageMetadata jpegMetadata, TagInfo tagInfo) throws IOException {
         final TiffField field = jpegMetadata.findExifValueWithExactMatch(tagInfo);
         if (field == null) {
-            writeSimpleStrings(tagInfo.name + ": " + "Not Found.", METADATA_FILE);
+            STRING_TO_WRITE += tagInfo.name + ": " + "Not Found." + '\n';
         } else {
-            writeSimpleStrings(tagInfo.name + ": " + field.getValueDescription(), METADATA_FILE);
+            STRING_TO_WRITE += tagInfo.name + ": " + field.getValueDescription() + '\n';
         }
+    }
+
+    public File getMetadataFile(){
+        return METADATA_FILE;
     }
 }
