@@ -17,16 +17,30 @@ public class MetadataRead{
     private static String METADATA_FILE_NAME = "";
     private static File METADATA_FILE;
     private static String STRING_TO_WRITE = "";
+    private static double latitude;
+    private static double longitude;
+    private static boolean hasGpsInfo = false;
 
-    private static String degreesToDecimal(RationalNumber degrees, RationalNumber minutes, RationalNumber seconds) {
+    public boolean hasGpsInfo() {
+        return hasGpsInfo;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    private static double degreesToDecimal(RationalNumber degrees, RationalNumber minutes, RationalNumber seconds) {
         double degreesToDouble = degrees.doubleValue();
         double minutesToDouble = minutes.doubleValue();
         double secondsToDouble = seconds.doubleValue();
         double minutesToDegrees = minutesToDouble/60;
         double secondsToDegrees = secondsToDouble/3600;
         double decimalDegrees = degreesToDouble + minutesToDegrees + secondsToDegrees;
-        String result = Double.toString(decimalDegrees);
-        return result;
+        return decimalDegrees;
     }
 
     private static String removeExtension(String fname) {
@@ -58,6 +72,9 @@ public class MetadataRead{
     }
 
     public static void readImageMeta(final File imgFile) throws ImagingException, IOException {
+        hasGpsInfo = false;
+        latitude = 0;
+        longitude = 0;
         /** get all metadata stored in EXIF format (ie. from JPEG or TIFF). **/
         final ImageMetadata metadata = Imaging.getMetadata(imgFile);
         METADATA_FILE_NAME = removeExtension(imgFile.getName()) + "-meta.txt";
@@ -81,6 +98,7 @@ public class MetadataRead{
             if (null != exifMetadata) {
                 final GpsInfo gpsInfo = exifMetadata.getGpsInfo();
                 if (null != gpsInfo) {
+                    hasGpsInfo = true;
                     final String gpsDescription = gpsInfo.toString();
                     final double longitude = gpsInfo.getLongitudeAsDegreesEast();
                     final double latitude = gpsInfo.getLatitudeAsDegreesNorth();
@@ -118,8 +136,10 @@ public class MetadataRead{
                 
                 STRING_TO_WRITE += "    " + "GPS Latitude: " + gpsLatitudeDegrees.toDisplayString() + " degrees, " + gpsLatitudeMinutes.toDisplayString() + " minutes, " + gpsLatitudeSeconds.toDisplayString() + " seconds " + gpsLatitudeRef + '\n';
                 STRING_TO_WRITE += "    " + "GPS Longitude: " + gpsLongitudeDegrees.toDisplayString() + " degrees, " + gpsLongitudeMinutes.toDisplayString() + " minutes, " + gpsLongitudeSeconds.toDisplayString() + " seconds " + gpsLongitudeRef + '\n';
-                STRING_TO_WRITE += "    " + "Decimal Degrees Latitude: " + degreesToDecimal(gpsLatitudeDegrees, gpsLatitudeMinutes, gpsLatitudeSeconds) + '\n';
-                STRING_TO_WRITE += "    " + "Decimal Degrees Longitude: " + degreesToDecimal(gpsLongitudeDegrees,gpsLongitudeMinutes,gpsLongitudeSeconds) + '\n';
+                STRING_TO_WRITE += "    " + "Decimal Degrees Latitude: " + Double.toString(degreesToDecimal(gpsLatitudeDegrees, gpsLatitudeMinutes, gpsLatitudeSeconds)) + '\n';
+                STRING_TO_WRITE += "    " + "Decimal Degrees Longitude: " + Double.toString(degreesToDecimal(gpsLongitudeDegrees,gpsLongitudeMinutes,gpsLongitudeSeconds)) + '\n';
+                latitude = degreesToDecimal(gpsLatitudeDegrees, gpsLatitudeMinutes, gpsLatitudeSeconds);
+                longitude = degreesToDecimal(gpsLongitudeDegrees,gpsLongitudeMinutes,gpsLongitudeSeconds);
             }
         }
     }
