@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.Scanner;
-
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingException;
 import org.apache.commons.imaging.common.ImageMetadata;
@@ -16,11 +15,12 @@ import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
-import org.apache.commons.io.FileUtils;
 
 public class MetadataWrite {
 
-    Hashtable<String, String> hashtable = new Hashtable<>();
+    private Hashtable<String, String> hashtable = new Hashtable<>();
+    private String FILE_DESTINATION_NAME = "";
+    private String NEW_IMAGE_FILE_DESTINATION = "";
 
     private void readFile(String filename) {
         try {
@@ -37,18 +37,36 @@ public class MetadataWrite {
         }
     }
 
+    private static String removeExtension(String fname) {
+        int pos = fname.lastIndexOf('.');
+        if(pos > -1)
+           return fname.substring(0, pos);
+        else
+           return fname;
+    }
+
+    public String getNewMetadataFileDestinationName(){
+        return FILE_DESTINATION_NAME + "-newMetadata-meta.txt";
+    }
+
+    public String getNewImageFileDestination(){
+        return NEW_IMAGE_FILE_DESTINATION;
+    }
+
     /**
      * This example illustrates how to add/update EXIF metadata in a JPEG file.
      *
      * @param jpegImageFile A source image file.
-     * @param dst           The output file.
+     * @param filename Archivo de texto que contiene los nuevos metadatos
      * @throws IOException
      * @throws ImagingException
      * @throws ImagingException
      */
-    public void changeExifMetadata(final File jpegImageFile, final File dst, String filename) throws IOException, ImagingException, ImagingException {
+    public void changeExifMetadata(final File jpegImageFile, String filename) throws IOException, ImagingException, ImagingException {
+        FILE_DESTINATION_NAME = removeExtension(jpegImageFile.getName());
+        NEW_IMAGE_FILE_DESTINATION = "/home/rodrigo/icc_proyecto_final/writeResults/" + FILE_DESTINATION_NAME + "-newMetadata.jpeg";
         readFile(filename);
-        try (FileOutputStream fos = new FileOutputStream(dst);
+        try (FileOutputStream fos = new FileOutputStream(NEW_IMAGE_FILE_DESTINATION);
                 OutputStream os = new BufferedOutputStream(fos)) {
 
             TiffOutputSet outputSet = null;
@@ -122,11 +140,8 @@ public class MetadataWrite {
 
             {
                 // Example of how to add/update GPS info to output set.
-
-                // New York City
-                final double longitude = -74.0; // 74 degrees W (in Degrees East)
-                final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
-                // North)
+                final double longitude = Double.parseDouble(hashtable.get("latitud"));
+                final double latitude = Double.parseDouble(hashtable.get("longitud"));
 
                 outputSet.setGpsInDegrees(longitude, latitude);
             }
@@ -134,19 +149,6 @@ public class MetadataWrite {
             // printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_DATE_TIME);
 
             new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
-        }
-    }
-
-    public static void main(String[] args) {
-        File sourceFile = new File("/home/rodrigo/icc_proyecto_final/jvak0pwtp4sd1.jpeg");
-        File destinationFile = new File("/home/rodrigo/icc_proyecto_final/writeResults/jvak0pwtp4sd1-newMetadata.jpeg");
-        String filename = "newMetadata2.txt";
-
-        MetadataWrite metadataWrite = new MetadataWrite();
-        try {
-            metadataWrite.changeExifMetadata(sourceFile, destinationFile, filename);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

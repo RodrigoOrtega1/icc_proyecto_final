@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -21,14 +22,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.apache.commons.imaging.ImagingException;
+
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatAtomOneDarkIJTheme;
 
 public class GUI implements ActionListener{
     private JFrame frame;
+    private JPanel topPanel;
     private JButton uploadImageButton;
     private JButton openInMapsButton;
+    private JButton openTextFileButton;
     private File fileToWorkOn;
     private MetadataRead metadataRead = new MetadataRead();
+    private MetadataWrite metadataWrite = new MetadataWrite();
     private JScrollPane scrollPane;
     private JLabel imageLabel;
     private double latitude;
@@ -44,13 +51,28 @@ public class GUI implements ActionListener{
         uploadImageButton.setFocusable(false);
         uploadImageButton.addActionListener(this);
 
+        openTextFileButton = new JButton("Cambia los metadatos");
+        openTextFileButton.setFocusable(false);
+        openTextFileButton.setVisible(false);
+        openTextFileButton.addActionListener(e -> {
+            try {
+                changeMetadata();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+
         openInMapsButton = new JButton("Abrir en Google Maps");
         openInMapsButton.setFocusable(false);
         openInMapsButton.setVisible(false);
         openInMapsButton.addActionListener(e -> openInGoogleMaps());
 
+        topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.add(uploadImageButton);
+
         frame.setLayout(new BorderLayout());
-        frame.add(uploadImageButton, BorderLayout.NORTH);
+        frame.add(topPanel, BorderLayout.NORTH);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
@@ -104,8 +126,6 @@ public class GUI implements ActionListener{
                     frame.revalidate();
                     frame.repaint();
 
-                    System.out.println(metadataRead.hasGpsInfo());
-
                     if (metadataRead.hasGpsInfo()) {
                         latitude = metadataRead.getLatitude();
                         longitude = metadataRead.getLongitude();
@@ -114,10 +134,61 @@ public class GUI implements ActionListener{
                         openInMapsButton.setVisible(false);
                     }
 
+                    if (!topPanel.isAncestorOf(openTextFileButton)) {
+                        topPanel.add(openTextFileButton);
+                    }
+                    openTextFileButton.setVisible(true);
+                    topPanel.revalidate();
+                    topPanel.repaint();
+
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             }
+        }
+    }
+
+    @SuppressWarnings("static-access")
+    private void changeMetadata() throws ImagingException, IOException{
+        JFileChooser file_upload = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files", "txt");
+        file_upload.setFileFilter(filter);
+        int res = file_upload.showOpenDialog(null);
+
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File metadataFile = new File(file_upload.getSelectedFile().getAbsolutePath());
+
+            metadataWrite.changeExifMetadata(fileToWorkOn, metadataFile.getName());
+
+            File newMetadata = new File(metadataWrite.getNewMetadataFileDestinationName());
+            File newImage = new File(metadataWrite.getNewImageFileDestination());
+
+            JTextArea textArea = new JTextArea(20, 50);
+            FileReader reader = new FileReader(newMetadata);
+            textArea.read(reader, "File");
+            JScrollPane newScrollPane = new JScrollPane(textArea);
+
+            if (scrollPane != null){
+                frame.remove(scrollPane);
+            }
+
+            scrollPane = newScrollPane;
+            frame.add(scrollPane, BorderLayout.CENTER);
+            frame.revalidate();
+            frame.repaint();
+
+            MetadataRead newMetadataRead = new MetadataRead();
+            newMetadataRead.readImageMeta(newImage);
+
+            if (newMetadataRead.hasGpsInfo()) {
+                latitude = newMetadataRead.getLatitude();
+                longitude = newMetadataRead.getLongitude();
+                openInMapsButton.setVisible(true);
+            } else {
+                openInMapsButton.setVisible(false);
+            }
+
+            JOptionPane.showMessageDialog(frame, "Se ha creado una copia de la imagen con los nuevos metadatos en la carpeta writeResults\n");
         }
     }
 
