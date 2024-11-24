@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingException;
@@ -56,7 +58,8 @@ public class MetadataRead{
            return fname;
     }
 
-    private static void createFile() {
+    private static void createFile() throws IOException {
+        Files.createDirectories(Paths.get("./Metadatos/"));
         METADATA_FILE = new File("./Metadatos/" + METADATA_FILE_NAME);
         try {
             if (METADATA_FILE.createNewFile()) {
@@ -85,7 +88,7 @@ public class MetadataRead{
         METADATA_FILE_NAME = removeExtension(imgFile.getName()) + "-meta.txt";
         createFile();
         if (metadata == null || metadata.getItems().isEmpty()){
-            STRING_TO_WRITE = "Tu imagen no contiene metadatos.";
+            STRING_TO_WRITE = "La imagen no contiene metadatos.";
         } else {
             STRING_TO_WRITE = metadata.toString() + '\n';
         }
@@ -133,11 +136,6 @@ public class MetadataRead{
                 final RationalNumber gpsLongitudeDegrees = gpsLongitude[0];
                 final RationalNumber gpsLongitudeMinutes = gpsLongitude[1];
                 final RationalNumber gpsLongitudeSeconds = gpsLongitude[2];
-    
-                // This will format the gps info like so:
-                //
-                // gpsLatitude: 8 degrees, 40 minutes, 42.2 seconds S
-                // gpsLongitude: 115 degrees, 26 minutes, 21.8 seconds E
                 
                 STRING_TO_WRITE += "    " + "GPS Latitude: " + gpsLatitudeDegrees.toDisplayString() + " degrees, " + gpsLatitudeMinutes.toDisplayString() + " minutes, " + gpsLatitudeSeconds.toDisplayString() + " seconds " + gpsLatitudeRef + '\n';
                 STRING_TO_WRITE += "    " + "GPS Longitude: " + gpsLongitudeDegrees.toDisplayString() + " degrees, " + gpsLongitudeMinutes.toDisplayString() + " minutes, " + gpsLongitudeSeconds.toDisplayString() + " seconds " + gpsLongitudeRef + '\n';
