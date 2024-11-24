@@ -56,7 +56,7 @@ public class MetadataRead{
     }
 
     private static void createFile() {
-        METADATA_FILE = new File(METADATA_FILE_NAME);
+        METADATA_FILE = new File("./Metadatos/" + METADATA_FILE_NAME);
         try {
             if (METADATA_FILE.createNewFile()) {
                 System.out.println("Creando archivo: " + METADATA_FILE.getName());

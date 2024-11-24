@@ -1,15 +1,19 @@
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+
 import javax.imageio.ImageIO;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,7 +24,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.imaging.ImagingException;
@@ -160,11 +163,13 @@ public class GUI implements ActionListener{
 
             metadataWrite.changeExifMetadata(fileToWorkOn, metadataFile.getName());
 
-            File newMetadata = new File(metadataWrite.getNewMetadataFileDestinationName());
             File newImage = new File(metadataWrite.getNewImageFileDestination());
+            MetadataRead newMetadataRead = new MetadataRead();
+            newMetadataRead.readImageMeta(newImage);
+            newMetadataRead.write();
 
             JTextArea textArea = new JTextArea(20, 50);
-            FileReader reader = new FileReader(newMetadata);
+            FileReader reader = new FileReader(newMetadataRead.getMetadataFile());
             textArea.read(reader, "File");
             JScrollPane newScrollPane = new JScrollPane(textArea);
 
@@ -176,9 +181,6 @@ public class GUI implements ActionListener{
             frame.add(scrollPane, BorderLayout.CENTER);
             frame.revalidate();
             frame.repaint();
-
-            MetadataRead newMetadataRead = new MetadataRead();
-            newMetadataRead.readImageMeta(newImage);
 
             if (newMetadataRead.hasGpsInfo()) {
                 latitude = newMetadataRead.getLatitude();
@@ -215,15 +217,5 @@ public class GUI implements ActionListener{
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new GUI();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
 }

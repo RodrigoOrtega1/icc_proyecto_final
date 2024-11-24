@@ -46,7 +46,7 @@ public class MetadataWrite {
     }
 
     public String getNewMetadataFileDestinationName(){
-        return FILE_DESTINATION_NAME + "-newMetadata-meta.txt";
+        return "./Metadatos/" + FILE_DESTINATION_NAME + "-newMetadata-meta.txt";
     }
 
     public String getNewImageFileDestination(){
@@ -64,7 +64,7 @@ public class MetadataWrite {
      */
     public void changeExifMetadata(final File jpegImageFile, String filename) throws IOException, ImagingException, ImagingException {
         FILE_DESTINATION_NAME = removeExtension(jpegImageFile.getName());
-        NEW_IMAGE_FILE_DESTINATION = "/home/rodrigo/icc_proyecto_final/writeResults/" + FILE_DESTINATION_NAME + "-newMetadata.jpeg";
+        NEW_IMAGE_FILE_DESTINATION = "./ImagenesNuevosMetadatos/" + FILE_DESTINATION_NAME + "-newMetadata.jpeg";
         readFile(filename);
         try (FileOutputStream fos = new FileOutputStream(NEW_IMAGE_FILE_DESTINATION);
                 OutputStream os = new BufferedOutputStream(fos)) {
@@ -145,8 +145,6 @@ public class MetadataWrite {
 
                 outputSet.setGpsInDegrees(longitude, latitude);
             }
-
-            // printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_DATE_TIME);
 
             new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
         }
