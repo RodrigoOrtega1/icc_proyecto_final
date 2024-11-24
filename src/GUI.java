@@ -190,7 +190,7 @@ public class GUI implements ActionListener{
                 openInMapsButton.setVisible(false);
             }
 
-            JOptionPane.showMessageDialog(frame, "Se ha creado una copia de la imagen con los nuevos metadatos en la carpeta writeResults\n");
+            JOptionPane.showMessageDialog(frame, "Se ha creado una copia de la imagen con los nuevos metadatos en la carpeta Metadatos\n");
         }
     }
 
