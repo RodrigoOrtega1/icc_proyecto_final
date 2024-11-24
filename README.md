@@ -7,7 +7,7 @@ Este programa requiere las librerías:
 * Flatlaf-intellij-themes v3.5.2
 
 ## Formato
-Formato correcto de archivo para sobreescribir metadata, si se quieren ver ejemplos consultar la carpeta archivos ejemplo:
+Formato correcto de archivo para sobreescribir metadata, si se quieren ver ejemplos consultar la carpeta Ejemplos-Sobreescribir-Metadatos:
 * llave : valor (Una llave separada por dos puntos y un valor
 
 Campos EXIF que edita el programa:

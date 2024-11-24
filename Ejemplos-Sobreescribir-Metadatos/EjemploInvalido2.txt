@@ -1,0 +1,9 @@
+lens:Faunalens
+date_original:1970:01:01 12:34:56
+time_digitized:1970:01:01 12:34:56 
+comment:Man I Love Fauna
+owner:Rodrigo
+cameraname:Rodrigo
+erial_number:12345678
+e:-74
+gitude:40

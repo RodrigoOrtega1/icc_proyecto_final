@@ -1,0 +1,9 @@
+lens_model:blehlens
+date_time_original:2006:01:01 12:34:56
+date_time_digitized:1970:01:01 12:34:56
+user_comment:adwadw
+owner_name:Pablos
+camera_owner_name:Pablo
+body_serial_number:08102002E
+latitud:50
+longitud:65

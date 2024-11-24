@@ -1,0 +1,9 @@
+lens_model:Lensbleh
+date_time_original:1970:01:01 12:34:56
+date_time_digitized:1970:01:01 12:34:56
+user_comment:idk
+owner_name:Rodrigo
+camera_owner_name:Rodrigo
+body_serial_number:12345678
+latitude:-74
+longitude:40
