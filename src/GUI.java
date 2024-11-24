@@ -1,3 +1,14 @@
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -10,19 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatAtomOneDarkIJTheme;
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class GUI implements ActionListener{
     private JFrame frame;
@@ -80,7 +79,7 @@ public class GUI implements ActionListener{
 
                     BufferedImage originalImage = ImageIO.read(fileToWorkOn);
                     int newWidth = 300;
-                    int newHeight = (originalImage.getHeight() * newWidth) / originalImage.getWidth(); // Maintain aspect ratio
+                    int newHeight = (originalImage.getHeight() * newWidth) / originalImage.getWidth();
                     Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
                     ImageIcon imageIcon = new ImageIcon(scaledImage);
                     

@@ -33,6 +33,10 @@ public class MetadataRead{
         return longitude;
     }
 
+    public File getMetadataFile(){
+        return METADATA_FILE;
+    }
+
     private static double degreesToDecimal(RationalNumber degrees, RationalNumber minutes, RationalNumber seconds) {
         double degreesToDouble = degrees.doubleValue();
         double minutesToDouble = minutes.doubleValue();
@@ -151,9 +155,5 @@ public class MetadataRead{
         } else {
             STRING_TO_WRITE += tagInfo.name + ": " + field.getValueDescription() + '\n';
         }
-    }
-
-    public File getMetadataFile(){
-        return METADATA_FILE;
     }
 }
