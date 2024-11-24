@@ -78,14 +78,16 @@ public class MetadataWrite {
      */
     public int changeExifMetadata(final File jpegImageFile, String filename) throws IOException, ImagingException, ImagingException {
         boolean hasMetadata = false;
+
         Files.createDirectories(Paths.get("./ImagenesNuevasMetadatos/"));
+
         FILE_DESTINATION_NAME = removeExtension(jpegImageFile.getName());
         NEW_IMAGE_FILE_DESTINATION = "./ImagenesNuevasMetadatos/" + FILE_DESTINATION_NAME + "-newMetadata.jpeg";
-        System.out.println(readFile(filename));
+
         if (!readFile(filename)){
             return 1;
         }
-        readFile(filename);
+        
         try (FileOutputStream fos = new FileOutputStream(NEW_IMAGE_FILE_DESTINATION);
                 OutputStream os = new BufferedOutputStream(fos)) {
 

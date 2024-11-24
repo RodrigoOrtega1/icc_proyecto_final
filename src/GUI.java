@@ -161,7 +161,7 @@ public class GUI implements ActionListener{
         if (res == JFileChooser.APPROVE_OPTION) {
             File metadataFile = new File(file_upload.getSelectedFile().getAbsolutePath());
 
-            int changeExifMetadataReturnValue = metadataWrite.changeExifMetadata(fileToWorkOn, metadataFile.getName());
+            int changeExifMetadataReturnValue = metadataWrite.changeExifMetadata(fileToWorkOn, metadataFile.getAbsolutePath());
             if(changeExifMetadataReturnValue == 1){
                 JOptionPane.showMessageDialog(frame, "No fue posible cambiar los datos de tu imagen, checa que tu archivo " + metadataFile.getName() + " tenga el formato correcto\nPara ver el formato correcto consulta el README", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
